@@ -111,7 +111,7 @@ if st.session_state.nombre_archivo:
                             st.subheader("📊 Gráfico")
                             # Decodificamos el Base64 que nos mandó FastAPI de vuelta a bytes
                             image_bytes = base64.b64decode(datos["imagen_base64"])
-                            st.image(image_bytes, use_column_width=True)
+                            st.image(image_bytes, use_container_width=True)
                         
                         # 3. Sección expandible para el código y los botones de descarga
                         with st.expander("Ver Código y Detalles de Consola"):
