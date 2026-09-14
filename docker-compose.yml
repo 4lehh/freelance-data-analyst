@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # El servidor principal de Ollama (se queda corriendo siempre)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag_data_ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+  # El instalador automático (hace su trabajo y se apaga)
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: rag_data_ollama_init
+    depends_on:
+      - ollama
+    environment:
+      # Apunta al contenedor principal de Ollama
+      - OLLAMA_HOST=http://ollama:11434
+    # Espera 5 segundos para asegurar que el servidor levantó, y luego descarga
+    command: sh -c "sleep 5 && ollama pull gemma4:e2b"
+
+  backend:
+    build: ./backend
+    container_name: rag_data_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      # NUEVO: Volumen administrado por Docker para los datos
+      - shared_data:/app/data
+    depends_on:
+      - ollama
+
+  frontend:
+    build: ./frontend
+    container_name: rag_data_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+
+# Declaración de todos los volúmenes de Docker
+volumes:
+  ollama_models:
+  shared_data: # <--- Docker creará y gestionará este espacio internamente

@@ -1,0 +1,9 @@
+fastapi
+pandas
+numpy
+pydantic
+python-multipart
+requests
+uvicorn
+matplotlib
+seaborn
