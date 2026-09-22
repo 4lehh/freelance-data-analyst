@@ -1,19 +1,12 @@
-FROM python:3.11-slim
+FROM nginx:1.27-alpine
 
-# Establecemos el directorio de trabajo
-WORKDIR /app
+# Estáticos de la aplicación
+COPY index.html /usr/share/nginx/html/index.html
+COPY static/ /usr/share/nginx/html/static/
 
-# Copiamos primero SOLO el requirements (esto optimiza la caché de Docker)
-COPY requirements.txt .
+# Configuración con el reverse-proxy hacia el backend
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Instalamos las dependencias
-RUN pip install --no-cache-dir -r requirements.txt 
+EXPOSE 80
 
-# Copiamos el resto del código (tu app.py)
-COPY . .
-
-# Indicamos qué puerto usa el contenedor para Streamlit
-EXPOSE 8501
-
-# Ejecutamos Streamlit
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]
