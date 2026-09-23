@@ -23,6 +23,7 @@
     dzSub: $("dz-sub"),
     dzFile: $("dz-file"),
     uploadBtn: $("upload-btn"),
+    filesPanel: $("files-panel"),
     filesEmpty: $("files-empty"),
     fileSelect: $("file-select"),
     deleteBtn: $("delete-btn"),
@@ -45,6 +46,10 @@
     consoleError: $("console-error"),
     consoleErrorContent: $("console-error-content"),
     toasts: $("toasts"),
+    tutorialModal: $("tutorial-modal"),
+    tutorialOpen: $("tutorial-open"),
+    tutorialClose: $("tutorial-close"),
+    tutorialDone: $("tutorial-done"),
   };
 
   /* ============================================================
@@ -155,6 +160,7 @@
   function volcarSelect() {
     const opt = state.archivos;
     els.filesEmpty.hidden = opt.length !== 0;
+    els.filesPanel.hidden = opt.length === 0;
 
     // Si ya hay archivo activo y sigue en la lista, lo conservamos
     if (state.nombreArchivo) {
@@ -245,6 +251,7 @@
         toast("success", "Archivo guardado: " + archivo.name);
         await refrescarArchivos();
         siguienteCampoLimpio();
+        desplazarHasta(els.filesPanel || els.analysisPanel, "center");
       } else {
         let detalle = "Error al subir el archivo.";
         try {
@@ -264,6 +271,13 @@
     els.fileInput.value = "";
     els.dropzone.classList.remove("has-file");
     els.dzFile.hidden = true;
+  }
+
+  function desplazarHasta(el, bloque) {
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: bloque || "start" });
+    });
   }
 
   /* ============================================================
@@ -391,6 +405,23 @@
     el.classList.add("reveal");
   }
 
+  /* ============================================================
+     Tutorial
+     ============================================================ */
+  const TUTORIAL_FLAG = "tutorial_visto";
+
+  function abrirTutorial() {
+    els.tutorialModal.hidden = false;
+    document.body.style.overflow = "hidden";
+    els.tutorialClose.focus();
+  }
+
+  function cerrarTutorial() {
+    els.tutorialModal.hidden = true;
+    document.body.style.overflow = "";
+    els.tutorialOpen.focus();
+  }
+
   /* Renderiza markdown simple: párrafos, títulos, listas, negritas, código */
   function renderLongform(md) {
     const parrafos = String(md).split(/\n{2,}/);
@@ -511,6 +542,16 @@
         ejecutarAnalisis();
       }
     });
+
+    els.tutorialOpen.addEventListener("click", abrirTutorial);
+    els.tutorialClose.addEventListener("click", cerrarTutorial);
+    els.tutorialDone.addEventListener("click", cerrarTutorial);
+    els.tutorialModal.addEventListener("click", (e) => {
+      if (e.target === els.tutorialModal) cerrarTutorial();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !els.tutorialModal.hidden) cerrarTutorial();
+    });
   }
 
   /* ============================================================
@@ -518,6 +559,11 @@
      ============================================================ */
   async function init() {
     initEventos();
+    // Tutorial: se muestra una sola vez en la primera visita
+    if (!localStorage.getItem(TUTORIAL_FLAG)) {
+      localStorage.setItem(TUTORIAL_FLAG, "1");
+      abrirTutorial();
+    }
     await refrescarArchivos();
     sincronizarUI();
     // Reintento periódico mientras el backend no responda

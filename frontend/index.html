@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light">
   <title>Tu Analista de Datos Local</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
   <link rel="stylesheet" href="static/style.css">
@@ -11,8 +11,8 @@
 <body>
   <div class="app">
 
-    <!-- ============ BARRA LATERAL ============ -->
-    <aside class="sidebar" aria-label="Gestión de datos">
+    <!-- ============ CABECERA ============ -->
+    <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -23,15 +23,35 @@
         </div>
         <div class="brand-text">
           <h1>Tu Analista de Datos Local</h1>
-          <p>Sube tu dataset, hazle una pregunta y el LLM escribirá y ejecutará el código para darte la respuesta.</p>
+          <p>Sube un dataset, hazle una pregunta y el LLM escribirá y ejecutará el código para darte la respuesta.</p>
         </div>
       </div>
+      <div class="top-actions">
+        <span class="status">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span id="api-status">Conectando con el servidor…</span>
+        </span>
+        <button class="btn btn-ghost" id="tutorial-open" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 11v5M12 8v.01"/>
+          </svg>
+          <span>Cómo usar</span>
+        </button>
+      </div>
+    </header>
 
-      <!-- 1. CARGA DE DATOS -->
-      <section class="panel" id="upload-panel" aria-labelledby="upload-title">
-        <header class="panel-head">
-          <span class="step" aria-hidden="true">1</span>
-          <h2 id="upload-title">Carga de Datos</h2>
+    <!-- ============ CONTENIDO PRINCIPAL ============ -->
+    <main class="content">
+
+      <!-- PASO 1 · CARGA DE DATOS -->
+      <section class="step-panel" id="upload-step" aria-labelledby="upload-title">
+        <header class="step-head">
+          <span class="step-num" aria-hidden="true">1</span>
+          <div class="step-titles">
+            <h2 id="upload-title">Carga de Datos</h2>
+            <p>Arrastra tu archivo <span class="mono">.csv</span> o selecciónalo desde tu equipo.</p>
+          </div>
         </header>
 
         <label class="dropzone" for="file-input" id="dropzone">
@@ -41,7 +61,7 @@
             <path d="M4 15.5v2.5A2 2 0 0 0 6 20h12a2 2 0 0 0 2-2v-2.5"/>
           </svg>
           <span class="dz-main" id="dz-main">Arrastra tu CSV aquí</span>
-          <span class="dz-sub">o haz clic para elegir un archivo <span class="mono">.csv</span></span>
+          <span class="dz-sub" id="dz-sub">o haz clic para elegir un archivo <span class="mono">.csv</span></span>
           <span class="dz-file mono" id="dz-file" hidden></span>
         </label>
 
@@ -54,14 +74,17 @@
         </button>
       </section>
 
-      <!-- ARCHIVOS DISPONIBLES -->
-      <section class="panel" aria-labelledby="files-title">
-        <header class="panel-head">
-          <span class="step-step" aria-hidden="true">▤</span>
-          <h2 id="files-title">Archivos Disponibles</h2>
+      <!-- PASO 2 · DATASET ACTIVO -->
+      <section class="step-panel" id="files-panel" aria-labelledby="files-title" hidden>
+        <header class="step-head">
+          <span class="step-num" aria-hidden="true">2</span>
+          <div class="step-titles">
+            <h2 id="files-title">Dataset activo</h2>
+            <p>Elige el archivo que quieres analizar.</p>
+          </div>
         </header>
 
-        <div id="files-empty" class="hint hint-soft" hidden>No hay archivos en el servidor. Sube uno arriba.</div>
+        <div id="files-empty" class="hint hint-soft" hidden>No hay archivos en el servidor. Sube uno en el paso anterior.</div>
 
         <label class="field-label" for="file-select">Selecciona un dataset para analizar</label>
         <select id="file-select" disabled>
@@ -77,20 +100,14 @@
         </button>
       </section>
 
-      <footer class="sidebar-foot">
-        <span class="status-dot" id="api-status-dot"></span>
-        <span id="api-status">Conectando con el servidor…</span>
-      </footer>
-    </aside>
-
-    <!-- ============ CONTENIDO PRINCIPAL ============ -->
-    <main class="content">
-
-      <!-- ZONA DE ANÁLISIS -->
-      <section class="panel analysis" id="analysis-panel" aria-labelledby="analysis-title" hidden>
-        <header class="panel-head panel-head-lg">
-          <span class="step" aria-hidden="true">2</span>
-          <h2 id="analysis-title">Zona de Análisis</h2>
+      <!-- PASO 3 · ANÁLISIS -->
+      <section class="step-panel analysis" id="analysis-panel" aria-labelledby="analysis-title" hidden>
+        <header class="step-head">
+          <span class="step-num" aria-hidden="true">3</span>
+          <div class="step-titles">
+            <h2 id="analysis-title">Zona de Análisis</h2>
+            <p>Describe qué quieres investigar. El modelo generará y ejecutará el código Python.</p>
+          </div>
           <span class="chip mono" id="active-file-chip">—</span>
         </header>
 
@@ -107,7 +124,7 @@
           </svg>
           <span>Ejecutar Análisis</span>
         </button>
-        <p class="hint" id="analyze-hint">El modelo generará código Python, lo ejecutará y te mostrará el resultado.</p>
+        <p class="hint" id="analyze-hint">Consejo: también puedes pulsar <span class="mono">Ctrl+Enter</span> para ejecutar.</p>
       </section>
 
       <!-- ESTADO VACÍO -->
@@ -117,8 +134,8 @@
             <path d="M3 7.5a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5z"/>
           </svg>
         </div>
-        <h2 id="empty-title">Sin dataset activo</h2>
-        <p>Sube un archivo CSV desde el panel lateral para comenzar el análisis.</p>
+        <h2 id="empty-title">Empieza subiendo un dataset</h2>
+        <p>Usa el paso 1 de esta página para cargar tu primer archivo CSV.</p>
       </section>
 
       <!-- RESULTADOS -->
@@ -172,6 +189,75 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- ============ TUTORIAL ============ -->
+  <div class="modal-backdrop" id="tutorial-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+      <header class="modal-head">
+        <div class="modal-title">
+          <span class="modal-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.5 9a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1 1-1.1 1.8v.5"/>
+              <path d="M12 17.5v.01"/>
+            </svg>
+          </span>
+          <h2 id="tutorial-title">Cómo usar Tu Analista de Datos</h2>
+        </div>
+        <button class="modal-close" id="tutorial-close" type="button" aria-label="Cerrar tutorial">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <ol class="tutorial-steps">
+          <li>
+            <span class="t-num" aria-hidden="true">1</span>
+            <div>
+              <strong>Carga tu dataset</strong>
+              <p>Arrastra un archivo <span class="mono">.csv</span> o haz clic en la zona de carga y pulsa <em>Subir al servidor</em>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="t-num" aria-hidden="true">2</span>
+            <div>
+              <strong>Selecciona el archivo activo</strong>
+              <p>Cuando suba tu primer archivo, aparecerá un desplegable para elegir qué dataset analizar.</p>
+            </div>
+          </li>
+          <li>
+            <span class="t-num" aria-hidden="true">3</span>
+            <div>
+              <strong>Escribe una pregunta</strong>
+              <p>Describe en lenguaje natural qué quieres investigar, por ejemplo: <em>«Haz un boxplot de los salarios por departamento»</em>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="t-num" aria-hidden="true">4</span>
+            <div>
+              <strong>Ejecuta el análisis</strong>
+              <p>Pulsa <em>Ejecutar Análisis</em> o usa <span class="mono">Ctrl+Enter</span>. El modelo generará el código Python, lo ejecutará y te mostrará el resultado.</p>
+            </div>
+          </li>
+          <li>
+            <span class="t-num" aria-hidden="true">5</span>
+            <div>
+              <strong>Revisa los resultados</strong>
+              <p>Verás la explicación, el gráfico y el código generado. Puedes descargar el script si lo necesitas.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <footer class="modal-foot">
+        <button class="btn btn-primary" id="tutorial-done" type="button">
+          <span>¡Entendido!</span>
+        </button>
+      </footer>
+    </div>
   </div>
 
   <!-- NOTIFICACIONES -->
