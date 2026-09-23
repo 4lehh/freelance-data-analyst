@@ -18,7 +18,7 @@ os.makedirs(DATA_DIR, exist_ok=True)        # Se crea si no existe
 
 # Ollama
 OLLAMA_URL = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-
+OLLAMA_MODEL = "qwen2.5-coder"
 
 # Data del modelo
 class AnalisisRequest(BaseModel):
@@ -125,7 +125,7 @@ async def analizar_datos(request: AnalisisRequest):
     # Llamar a Ollama
     try:
         response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-            "model": "qwen2.5-coder", 
+            "model": OLLAMA_MODEL, 
             "prompt": system_prompt,
             "stream": False
         })
